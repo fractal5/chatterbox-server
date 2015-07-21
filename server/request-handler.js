@@ -12,8 +12,14 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+var _ = require('underscore');
+var fs = require('fs');
+
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
+  //
+  // request is an http.IncomingMessage
+  // response is an http.ServerResponse
   //
   // They include information about both the incoming request, such as
   // headers and URL, and about the outgoing response, such as its status
@@ -40,6 +46,30 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "text/plain";
+
+  // Execute response based on the request method (POST, GET, etc.)
+  if (request.method === 'POST') {
+    var fullBody = '';
+    request.on('data', function (chunk) {
+      fullBody += chunk.toString();
+    });
+
+    request.on('end', function() {
+      fs.exists('messages.json', function (exists) {
+        if (!exists) {
+          fullBody = '[' + fullBody + ']';
+          fs.appendFile('messages.json', fullBody, function (err) {
+            console.log(err);
+          });
+        } else {
+          // parse array in json file
+          // push messages object to array
+          // stringify new array
+          // write new array to the json file
+        }
+      })
+    });
+  }
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
@@ -71,3 +101,14 @@ var defaultCorsHeaders = {
   "access-control-max-age": 10 // Seconds.
 };
 
+var responses = {};
+
+responses.POST = function () {
+
+};
+
+responses.GET = function () {
+
+};
+
+exports.requestHandler = requestHandler;
