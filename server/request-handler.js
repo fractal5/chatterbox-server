@@ -59,17 +59,23 @@ var requestHandler = function(request, response) {
         if (!exists) {
           fullBody = '[' + fullBody + ']';
           fs.appendFile('messages.json', fullBody, function (err) {
+            // TODO: handle errors ... possibly return error code to client
             console.log(err);
           });
         } else {
-          // parse array in json file
-          // push messages object to array
-          // stringify new array
-          // write new array to the json file
+          fs.readFile('messages.json', function(err, data) {
+            var newData = JSON.parse(data.toString());
+            newData.push(JSON.parse(fullBody));
+            newData = JSON.stringify(newData);
+            fs.writeFile('messages.json', newData, function (err) {
+              // error handling with ref to err
+            });
+          });
         }
-      })
+      });
     });
   }
+  // else if (request.method === 'GET')
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
